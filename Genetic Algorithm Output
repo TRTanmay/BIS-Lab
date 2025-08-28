@@ -1,0 +1,29 @@
+Enter the 4 initial chromosomes (each of length 5):
+Enter chromosome 1: 01100
+Enter chromosome 2: 11001
+Enter chromosome 3: 00101
+Enter chromosome 4: 10011
+
+Initial Population:
+String no. 1: 01100
+String no. 2: 11001
+String no. 3: 00101
+String no. 4: 10011
+
+Fitness Calculation:
+String no.      Initial population      x value         Fitness function = x^2
+1               01100                   12              144
+2               11001                   25              625
+3               00101                   5               25
+4               10011                   19              361
+
+Sum = 1155
+Average = 288.75
+Maximum = 625
+
+Probability and Expected Outcome:
+String no.      Probability             Prob %          Expected outcome
+1               0.1247                  12.47           0.4987
+2               0.5411                  54.11           2.1645
+3               0.0216                  2.16            0.0866
+4               0.3126                  31.26           1.2502
