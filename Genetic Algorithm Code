@@ -1,0 +1,50 @@
+import random
+
+population_size = 4
+chromosome_length = 5
+
+initial_population = []
+print(f"Enter the {population_size} initial chromosomes (each of length {chromosome_length}):")
+for i in range(population_size):
+    while True:
+        chromosome = input(f"Enter chromosome {i+1}: ")
+        if len(chromosome) == chromosome_length and all(c in '01' for c in chromosome):
+            initial_population.append(chromosome)
+            break
+        else:
+            print(f"Invalid input. Please enter a binary string of length {chromosome_length}.")
+
+print("\nInitial Population:")
+for i, chromosome in enumerate(initial_population):
+    print(f"String no. {i+1}: {chromosome}")
+
+fitness_values = []
+x_values = []
+
+for chromosome in initial_population:
+    x = int(chromosome, 2)
+    x_values.append(x)
+
+    fitness = x**2
+    fitness_values.append(fitness)
+
+print("\nFitness Calculation:")
+print("String no.      Initial population      x value         Fitness function = x^2")
+for i in range(population_size):
+    print(f"{i+1:<16}{initial_population[i]:<24}{x_values[i]:<16}{fitness_values[i]}")
+
+sum_fitness = sum(fitness_values)
+average_fitness = sum_fitness / population_size
+maximum_fitness = max(fitness_values)
+
+print(f"\nSum = {sum_fitness}")
+print(f"Average = {average_fitness}")
+print(f"Maximum = {maximum_fitness}")
+
+print("\nProbability and Expected Outcome:")
+print("String no.      Probability             Prob %          Expected outcome")
+for i in range(population_size):
+    probability = fitness_values[i] / sum_fitness
+    prob_percent = probability * 100
+    expected_outcome = fitness_values[i] / average_fitness
+    print(f"{i+1:<16}{probability:<24.4f}{prob_percent:<16.2f}{expected_outcome:.4f}")
