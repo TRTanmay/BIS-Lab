@@ -1,62 +1,43 @@
-import numpy as np
+import random
+def objective(pos):
+    return pos[0]**2 + pos[1]**2
 
-n_particles = 5
-n_dimensions = 2  # x, y
-w = 0.5  # Inertia weight
-c1 = 1.5  # Cognitive constant
-c2 = 1.5  # Social constant
-max_bounds = 5.12  # Search space bounds
-min_bounds = -5.12
-n_iterations = 2  # Only 2 iterations after initial
+num_particles = 5
+num_iterations = 10
+w = 0.5
+c1 = 1.0
+c2 = 1.0
+positions = [[random.uniform(-5, 5), random.uniform(-5, 5)] for _ in range(num_particles)]
+velocities = [[random.uniform(-1, 1), random.uniform(-1, 1)] for _ in range(num_particles)]
 
-np.random.seed(42)  # For reproducibility
-positions = np.random.uniform(min_bounds, max_bounds, (n_particles, n_dimensions))
-velocities = np.random.uniform(-1, 1, (n_particles, n_dimensions))
-pbests = positions.copy()
-gbest = None
-gbest_fitness = float('inf')
+pbests = [pos[:] for pos in positions]
+pbest_scores = [objective(p) for p in positions]
+gbest_score = max(pbest_scores)
+gbest = pbests[pbest_scores.index(gbest_score)][:]
+for it in range(num_iterations):
+    for i in range(num_particles):
+        for d in range(2):
+            r1 = random.random()
+            r2 = random.random()
 
-def fitness(position):
-    return np.sum(position ** 2)
+            velocities[i][d] = (
+                w * velocities[i][d]
+                + c1 * r1 * (pbests[i][d] - positions[i][d])
+                + c2 * r2 * (gbest[d] - positions[i][d])
+            )
+            positions[i][d] += velocities[i][d]
 
-fitness_values = np.array([fitness(pos) for pos in positions])
-for i in range(n_particles):
-    if fitness_values[i] < gbest_fitness:
-        gbest_fitness = fitness_values[i]
-        gbest = positions[i].copy()
+        score = objective(positions[i])
 
-history = [(positions.copy(), velocities.copy(), fitness_values.copy(), pbests.copy(), gbest.copy(), gbest_fitness)]
+        if score > pbest_scores[i]:
+            pbests[i] = positions[i][:]
+            pbest_scores[i] = score
 
-for t in range(n_iterations):
-    r1 = np.random.random((n_particles, n_dimensions))
-    r2 = np.random.random((n_particles, n_dimensions))
+    gbest_score = max(pbest_scores)
+    gbest = pbests[pbest_scores.index(gbest_score)][:]
+    print(f"Iteration {it+1}: Best fitness value = {gbest_score}")
 
-    velocities = (w * velocities + 
-                  c1 * r1 * (pbests - positions) + 
-                  c2 * r2 * (gbest - positions))
-
-    positions = positions + velocities
-
-    positions = np.clip(positions, min_bounds, max_bounds)
-
-    fitness_values = np.array([fitness(pos) for pos in positions])
-
-    for i in range(n_particles):
-        if fitness_values[i] < fitness(pbests[i]).sum():
-            pbests[i] = positions[i].copy()
-
-    min_fitness_idx = np.argmin(fitness_values)
-    if fitness_values[min_fitness_idx] < gbest_fitness:
-        gbest_fitness = fitness_values[min_fitness_idx]
-        gbest = positions[min_fitness_idx].copy()
-
-    history.append((positions.copy(), velocities.copy(), fitness_values.copy(), pbests.copy(), gbest.copy(), gbest_fitness))
-
-for t, (pos, vel, fit, pbest_pos, gbest_pos, gbest_fit) in enumerate(history):
-    print(f"\n#### Iteration {t}")
-    print("| Particle | Position (x, y)   | Velocity (vx, vy)      | Fitness    | Pbest Position (x, y)   | Pbest Fitness |")
-    print("|----------|-------------------|------------------------|------------|-------------------------|---------------|")
-    for i in range(n_particles):
-        print(f"| {i+1}        | {pos[i,0]:.4f}, {pos[i,1]:.4f}       | {vel[i,0]:.4f}, {vel[i,1]:.4f}           | {fit[i]:.4f}     | {pbest_pos[i,0]:.4f}, {pbest_pos[i,1]:.4f}             | {fitness(pbest_pos[i]):.4f}       |")
-    print(f"**Global Best Position (x, y)**: {gbest_pos[0]:.4f}, {gbest_pos[1]:.4f}")  
-    print(f"**Global Best Fitness**: {gbest_fit:.4f}")
+print("\nFinal drone waypoints:")
+for i, pos in enumerate(positions):
+    print(f"Drone {i+1}: {[round(coord, 2) for coord in pos]}")
+print("Final global best score (maximum objective value):", round(gbest_score, 2))
