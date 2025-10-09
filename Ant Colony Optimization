@@ -1,0 +1,99 @@
+import random
+
+def heuristic(i, j):
+    return random.uniform(1, 10)
+
+def objective(solution, distance_matrix, precedence_constraints):
+    total_cost = 0
+    for i in range(len(solution) - 1):
+        total_cost += distance_matrix[solution[i]][solution[i + 1]]
+    
+    penalty = 0
+    for i in range(1, len(solution)):
+        for j in range(i):
+            if precedence_constraints[solution[i]] < precedence_constraints[solution[j]]:
+                penalty += 100
+    
+    total_cost += penalty
+    return total_cost
+
+num_ants = 10
+num_iterations = 10
+num_tasks = 5
+alpha = 1.0
+beta = 2.0
+rho = 0.1
+tau_0 = 0.1
+
+pheromone_matrix = [[tau_0 for _ in range(num_tasks)] for _ in range(num_tasks)]
+
+precedence_constraints = [0, 1, 2, 3, 4]
+
+distance_matrix = [[random.uniform(1, 10) for _ in range(num_tasks)] for _ in range(num_tasks)]
+
+def aco_algorithm():
+    global pheromone_matrix
+    best_solution = None
+    best_cost = float('inf')
+    
+    iteration_best_costs = []
+
+    for iteration in range(num_iterations):
+        all_solutions = []
+        all_costs = []
+
+        for ant in range(num_ants):
+            solution = []
+            unvisited = list(range(num_tasks))
+            current_task = random.choice(unvisited)
+            solution.append(current_task)
+            unvisited.remove(current_task)
+            
+            while unvisited:
+                probabilities = []
+                for task in unvisited:
+                    pheromone = pheromone_matrix[current_task][task] ** alpha
+                    heuristic_value = heuristic(current_task, task) ** beta
+                    probability = pheromone * heuristic_value
+                    probabilities.append(probability)
+                
+                total_prob = sum(probabilities)
+                probabilities = [p / total_prob for p in probabilities]
+                
+                next_task = random.choices(unvisited, probabilities)[0]
+                solution.append(next_task)
+                unvisited.remove(next_task)
+                current_task = next_task
+
+            solution_cost = objective(solution, distance_matrix, precedence_constraints)
+            all_solutions.append(solution)
+            all_costs.append(solution_cost)
+
+            if solution_cost < best_cost:
+                best_solution = solution
+                best_cost = solution_cost
+
+        for i in range(num_tasks):
+            for j in range(num_tasks):
+                pheromone_matrix[i][j] *= (1 - rho)
+
+        for ant in range(num_ants):
+            for i in range(len(all_solutions[ant]) - 1):
+                task1 = all_solutions[ant][i]
+                task2 = all_solutions[ant][i + 1]
+                pheromone_matrix[task1][task2] += 1 / all_costs[ant]
+
+        iteration_best_costs.append(best_cost)
+
+    iteration_best_costs.sort()
+
+    print("Best Costs :")
+    for idx, cost in enumerate(iteration_best_costs, 1):
+        print(f"Iteration {idx}: Best Cost = {cost:.4f}")
+
+    return best_solution, best_cost
+
+best_solution, best_cost = aco_algorithm()
+
+print("\nBest solution found:", best_solution)
+print("Best cost (objective value):", best_cost)
