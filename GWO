@@ -1,0 +1,47 @@
+import numpy as np
+
+def f_otsu(x, hist_norm, total_mean, levels):
+    thresholds = np.sort(np.clip(np.round(x).astype(int), 0, 255))
+    levels[1:-1] = thresholds
+    
+    variance_sum = 0
+    for i in range(len(levels) - 1):
+        start, end = levels[i], levels[i+1]
+        w_i = np.sum(hist_norm[start:end])
+        mu_i = (np.sum(np.arange(start, end) * hist_norm[start:end]) / w_i) if w_i > 0 else 0
+        variance_sum += w_i * (mu_i - total_mean)**2
+        
+    return -variance_sum
+
+hist = np.zeros(256); hist[50:100], hist[150:200] = 500, 1000
+hist_norm = hist / np.sum(hist)
+total_mean = np.sum(np.arange(256) * hist_norm)
+levels = np.zeros(4, dtype=int); levels[-1] = 256
+
+DIM, N_WOLVES, MAX_ITER, LB, UB = 2, 30, 150, 1, 254 
+
+wolves = np.random.uniform(LB, UB, (N_WOLVES, DIM))
+fitness = np.array([f_otsu(w, hist_norm, total_mean, levels) for w in wolves])
+alpha, beta, delta = np.argsort(fitness)[:3]
+
+for t in range(MAX_ITER):
+    a = 2 - 2 * (t / MAX_ITER)
+    for i in range(N_WOLVES):
+        X_sum = np.zeros(DIM)
+        for j, leader in enumerate([alpha, beta, delta]):
+            r1, r2 = np.random.rand(DIM), np.random.rand(DIM)
+            A = 2 * a * r1 - a
+            C = 2 * r2
+            D = abs(C * wolves[leader] - wolves[i])
+            X_sum += wolves[leader] - A * D
+        
+        wolves[i] = np.clip(X_sum / 3, LB, UB)
+    
+    fitness = np.array([f_otsu(w, hist_norm, total_mean, levels) for w in wolves])
+    alpha, beta, delta = np.argsort(fitness)[:3]
+
+best_position = np.sort(np.round(wolves[alpha]).astype(int))
+best_fitness = -fitness[alpha]
+
+print(f"Best position (Optimal Thresholds): {best_position}")
+print(f"Best fitness (Max Variance): {best_fitness:.4f}")
