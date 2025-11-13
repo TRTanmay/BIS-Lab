@@ -1,0 +1,30 @@
+=== Cuckoo Search for 0/1 Knapsack Problem ===
+
+Number of items: 8
+Knapsack capacity: 80
+Items (Value, Weight):
+ Item 1: ($60, 10kg)
+ Item 2: ($100, 20kg)
+ Item 3: ($120, 30kg)
+ Item 4: ($80, 15kg)
+ Item 5: ($50, 12kg)
+ Item 6: ($70, 18kg)
+ Item 7: ($90, 25kg)
+ Item 8: ($110, 22kg)
+
+=== SOLUTION ===
+Selected items: [5 6 7]
+Total value: $400
+Total weight: 55kg / 80kg
+
+Item details:
+ Item 5: Value=$50, Weight=12kg
+ Item 6: Value=$70, Weight=18kg
+ Item 7: Value=$90, Weight=25kg
+
+Convergence (every 20 iterations):
+ Iter   1: Best Value = $400
+ Iter  21: Best Value = $400
+ Iter  41: Best Value = $400
+ Iter  61: Best Value = $400
+ Iter  81: Best Value = $400
