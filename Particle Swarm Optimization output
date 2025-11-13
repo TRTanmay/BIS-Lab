@@ -1,0 +1,18 @@
+Iteration 1: Best fitness value = 42.55830242682573
+Iteration 2: Best fitness value = 48.303298134522166
+Iteration 3: Best fitness value = 70.66118207617731
+Iteration 4: Best fitness value = 94.70344213061361
+Iteration 5: Best fitness value = 127.98447565143512
+Iteration 6: Best fitness value = 151.81784430205846
+Iteration 7: Best fitness value = 175.85801363745017
+Iteration 8: Best fitness value = 199.88130930513927
+Iteration 9: Best fitness value = 212.47068627292361
+Iteration 10: Best fitness value = 225.79235152703808
+
+Final drone waypoints:
+Drone 1: [-12.63, 7.76]
+Drone 2: [-12.55, 7.83]
+Drone 3: [-12.74, 7.44]
+Drone 4: [-3.06, 1.65]
+Drone 5: [-12.89, 7.72]
+Final global best score (maximum objective value): 225.79
