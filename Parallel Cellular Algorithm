@@ -1,0 +1,58 @@
+import numpy as np
+import random
+
+def f(x):
+    return x**2 - 4*x + 4
+
+def get_neighbors(i, j, rows, cols):
+    neighbors = []
+    for di in (-1, 0, 1):
+        for dj in (-1, 0, 1):
+            ni = (i + di) % rows
+            nj = (j + dj) % cols
+            neighbors.append((ni, nj))
+    return neighbors
+
+def parallel_cellular_algorithm(
+    grid_size=(10, 10),
+    iterations=100,
+    value_range=(-10, 10),
+    p_adopt_best=0.7
+):
+    rows, cols = grid_size
+    grid = np.random.uniform(value_range[0], value_range[1], size=(rows, cols))
+    best_history = []
+
+    for it in range(iterations):
+        fitness = f(grid)
+        best_idx = np.unravel_index(np.argmin(fitness), fitness.shape)
+        best_history.append(fitness[best_idx])
+        new_grid = grid.copy()
+
+        for i in range(rows):
+            for j in range(cols):
+                neigh_idx = get_neighbors(i, j, rows, cols)
+                neigh_vals = np.array([grid[x, y] for x, y in neigh_idx])
+                neigh_fit = f(neigh_vals)
+                best_local_val = neigh_vals[np.argmin(neigh_fit)]
+
+                if random.random() < p_adopt_best:
+                    new_val = best_local_val
+                else:
+                    new_val = np.mean(neigh_vals)
+
+                new_val += np.random.normal(scale=0.05)
+                new_grid[i, j] = new_val
+
+        grid = new_grid
+
+    final_fitness = f(grid)
+    best_idx = np.unravel_index(np.argmin(final_fitness), final_fitness.shape)
+    best_f = final_fitness[best_idx]
+
+    print("Best fitness =", best_f)
+    print("Best position in grid =", best_idx)
+
+    return best_f, best_history
+
+parallel_cellular_algorithm()
